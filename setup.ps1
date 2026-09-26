@@ -1,3 +1,15 @@
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
-& {$P = $env:TEMP + '\chromeremotedesktophost.msi'; Invoke-WebRequest 'https://dl.google.com/edgedl/chrome-remote-desktop/chromeremotedesktophost.msi' -OutFile $P; Start-Process $P -Wait; Remove-Item $P}
-& {$P = $env:TEMP + '\chrome_installer.exe'; Invoke-WebRequest 'https://dl.google.com/chrome/install/latest/chrome_installer.exe' -OutFile $P; Start-Process -FilePath $P -Args '/install' -Verb RunAs -Wait; Remove-Item $P}
+
+Write-Host "Downloading Google Chrome..."
+$Installer = "$env:TEMP\chrome_installer.exe"
+Invoke-WebRequest "https://dl.google.com/chrome/install/latest/chrome_installer.exe" -OutFile $Installer
+Start-Process -FilePath $Installer -ArgumentList "/silent", "/install" -Wait
+Remove-Item $Installer
+
+Write-Host "Downloading Chrome Remote Desktop..."
+$CrdInstaller = "$env:TEMP\remotedesktop.msi"
+Invoke-WebRequest "https://dl.google.com/edgedl/chrome-remote-desktop/remotedesktop.msi" -OutFile $CrdInstaller
+Start-Process -FilePath "msiexec.exe" -ArgumentList "/i `"$CrdInstaller`" /qn /norestart" -Wait
+Remove-Item $CrdInstaller
+
+Write-Host "Setup completed successfully!"
